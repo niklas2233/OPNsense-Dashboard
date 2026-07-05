@@ -585,7 +585,7 @@
         "connected_streams": [
           {
             "@type": "string",
-            "@value": "cc46a62f-b500-4fe7-865d-4539e75deda6"
+            "@value": "000000000000000000000001"
           }
         ]
       },
@@ -614,7 +614,7 @@
         },
         "source": {
           "@type": "string",
-          "@value": "rule \"GeoIP lookup: src_ip\"\nwhen\nhas_field(\"src_ip\")\nthen\nlet geo = lookup(\"geoip\", to_string($message.\"src_ip\"));\nset_field(\"src_ip_geo_location\", geo[\"coordinates\"]);\nset_field(\"src_ip_geo_country\", geo[\"country\"].iso_code);\nset_field(\"src_ip_geo_city\", geo[\"city\"].names.en);\nend"
+          "@value": "rule \"GeoIP lookup: src_ip\"\nwhen\nhas_field(\"src_ip\")\nthen\nlet geo = lookup(\"geoip\", to_string($message.\"src_ip\"));\nset_field(\"src_ip_geo_location\", geo[\"coordinates\"]);\nset_field(\"src_ip_geo_country\", geo[\"country\"].iso_code);\nend"
         }
       },
       "constraints": [

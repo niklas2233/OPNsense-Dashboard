@@ -1027,53 +1027,125 @@
       "type": "stat"
     },
     {
-      "circleMaxSize": "",
-      "circleMinSize": "",
-      "colors": [
-        "#37872D",
-        "#E0B400",
-        "#C4162A",
-        "#8F3BB8"
-      ],
       "datasource": "${ESdataSource}",
-      "decimals": 0,
-      "esGeoPoint": "src_location",
-      "esLocationName": "src_ip",
-      "esMetric": "Count",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#37872D",
+                "value": 0
+              },
+              {
+                "color": "#E0B400",
+                "value": 10
+              },
+              {
+                "color": "#C4162A",
+                "value": 100
+              },
+              {
+                "color": "#8F3BB8",
+                "value": 500
+              }
+            ]
+          }
+        }
+      },
       "gridPos": {
         "h": 11,
         "w": 13,
         "x": 6,
         "y": 13
       },
-      "height": "",
-      "hideEmpty": false,
-      "hideZero": false,
       "id": 59,
-      "initialZoom": "1",
-      "links": [],
-      "locationData": "countries",
-      "mapCenter": "(0°, 0°)",
-      "mapCenterLatitude": 0,
-      "mapCenterLongitude": 0,
       "maxDataPoints": 1,
-      "mouseWheelZoom": false,
-      "showLegend": true,
-      "stickyLabels": false,
-      "tableQueryOptions": {
-        "geohashField": "geohash",
-        "latitudeField": "latitude",
-        "longitudeField": "longitude",
-        "metricField": "metric",
-        "queryType": "geohash"
+      "options": {
+        "basemap": {
+          "name": "Basemap",
+          "type": "default"
+        },
+        "controls": {
+          "mouseWheelZoom": false,
+          "showAttribution": true,
+          "showDebug": false,
+          "showMeasure": false,
+          "showScale": false,
+          "showZoom": true
+        },
+        "layers": [
+          {
+            "config": {
+              "showLegend": true,
+              "style": {
+                "color": {
+                  "fixed": "dark-green"
+                },
+                "opacity": 0.4,
+                "rotation": {
+                  "fixed": 0,
+                  "max": 360,
+                  "min": -360,
+                  "mode": "mod"
+                },
+                "size": {
+                  "fixed": 5,
+                  "max": 15,
+                  "min": 2
+                },
+                "symbol": {
+                  "fixed": "img/icons/marker/circle.svg",
+                  "mode": "fixed"
+                },
+                "symbolAlign": {
+                  "horizontal": "center",
+                  "vertical": "center"
+                },
+                "textConfig": {
+                  "fontSize": 12,
+                  "offsetX": 0,
+                  "offsetY": 0,
+                  "textAlign": "center",
+                  "textBaseline": "middle"
+                }
+              }
+            },
+            "location": {
+              "gazetteer": "public/gazetteer/countries.json",
+              "mode": "lookup"
+            },
+            "name": "Layer 0",
+            "tooltip": true,
+            "type": "markers"
+          }
+        ],
+        "tooltip": {
+          "mode": "details"
+        },
+        "view": {
+          "allLayers": true,
+          "dashboardVariable": false,
+          "id": "zero",
+          "lat": 0,
+          "lon": 0,
+          "noRepeat": false,
+          "zoom": 1
+        }
       },
+      "pluginVersion": "9.5.0",
       "targets": [
         {
           "alias": "",
           "bucketAggs": [
             {
-              "$$hashKey": "object:974",
-              "fake": true,
               "field": "src_ip_geo_country",
               "id": "3",
               "settings": {
@@ -1083,23 +1155,11 @@
                 "size": "0"
               },
               "type": "terms"
-            },
-            {
-              "$$hashKey": "object:975",
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
             }
           ],
           "dsType": "elasticsearch",
           "metrics": [
             {
-              "$$hashKey": "object:972",
               "field": "select field",
               "id": "1",
               "type": "count"
@@ -1110,12 +1170,8 @@
           "timeField": "timestamp"
         }
       ],
-      "thresholds": "10,100,500",
       "title": "Firewall Blocked Event Locations on $iface",
-      "type": "grafana-worldmap-panel",
-      "unitPlural": "",
-      "unitSingle": "",
-      "valueName": "total"
+      "type": "geomap"
     },
     {
       "cacheTimeout": null,
@@ -1249,7 +1305,7 @@
             "sum"
           ],
           "fields": "",
-          "values": false
+          "values": true
         },
         "tooltip": {
           "mode": "single"
@@ -1271,17 +1327,6 @@
                 "size": "5"
               },
               "type": "terms"
-            },
-            {
-              "$$hashKey": "object:1776",
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
             }
           ],
           "dsType": "elasticsearch",
@@ -1348,7 +1393,7 @@
             "sum"
           ],
           "fields": "",
-          "values": false
+          "values": true
         },
         "tooltip": {
           "mode": "single"
@@ -1369,17 +1414,6 @@
                 "size": "0"
               },
               "type": "terms"
-            },
-            {
-              "$$hashKey": "object:1050",
-              "field": "timestamp",
-              "id": "2",
-              "settings": {
-                "interval": "auto",
-                "min_doc_count": 0,
-                "trimEdges": 0
-              },
-              "type": "date_histogram"
             }
           ],
           "dsType": "elasticsearch",
@@ -3118,8 +3152,7 @@
             "$__all"
           ]
         },
-        "datasource": null,
-        "definition": "from(bucket:\"opnsense\")\r\n  |> range(start: -24h)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"interface\"\r\n  )\r\n  |> last()\r\n  |> group(columns: [\"tag\"])\r\n  |> keep(columns: [\"name\"])",
+        "datasource": "Elasticsearch",
         "description": null,
         "error": null,
         "hide": 0,
@@ -3128,7 +3161,7 @@
         "multi": true,
         "name": "iface",
         "options": [],
-        "query": "from(bucket:\"opnsense\")\r\n  |> range(start: -24h)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"interface\"\r\n  )\r\n  |> last()\r\n  |> group(columns: [\"tag\"])\r\n  |> keep(columns: [\"name\"])",
+        "query": "{\"find\": \"terms\", \"field\": \"interface\"}",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
