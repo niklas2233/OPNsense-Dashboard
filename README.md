@@ -15,6 +15,23 @@
 - LAN Statistics - Traffic & Throughput (Identified by dashboard variable)
 - Firewall Statistics - Blocked Ports, Protocols, Events, Blocked IP Locations, and Top Blocked IP
 
+## Settings You Must Change For Your Own Install
+
+Everything below ships with placeholder or author-specific values. The detailed steps are in [Configuration](#configuration); this is the checklist to work through so you don't miss one.
+
+- **Grafana admin credentials** — `GF_SECURITY_ADMIN_USER` / `GF_SECURITY_ADMIN_PASSWORD` in the docker-compose example.
+- **Graylog root password** — `GRAYLOG_ROOT_PASSWORD_SHA2` defaults to `admin`/`admin`. Generate your own with `echo -n "yourpassword" | sha256sum`.
+- **Graylog password secret** — `GRAYLOG_PASSWORD_SECRET`, any random string of 16+ characters.
+- **Graylog external URI** — `GRAYLOG_HTTP_EXTERNAL_URI` should be the real IP/hostname Graylog is reachable at, not `127.0.0.1`, or the web UI will misbehave for anyone connecting from another machine.
+- **InfluxDB org, bucket, and API token** — created when you first set up InfluxDB (see InfluxDB below). The dashboard's Flux queries hardcode the bucket name `opnsense`, so either name your bucket `opnsense` or find-and-replace `bucket: "opnsense"` across the dashboard JSON before importing.
+- **Telegraf config** (`config/telegraf.conf`, placed on the router) — your InfluxDB URL, API token, org, and bucket under `[[outputs.influxdb_v2]]`.
+- **Grafana datasources on import** — Grafana prompts you to map the dashboard's `InfluxDB` and `Elasticsearch` datasource variables to your own data sources.
+- **Elasticsearch index name/pattern** — your Elasticsearch data source's index pattern must match the index prefix of the Graylog index set you create (e.g. both `opnsense_filterlog*`). A mismatch here is the single most common cause of every firewall panel silently showing "No data" — see the Changelog for more on this failure mode.
+- **`$WAN` dashboard variable** — comma-separated list of your own WAN interface name(s) (e.g. `igc4`), not the author's.
+- **`$LAN` dashboard variable** — its regex excludes specific interfaces from being grouped as LAN; edit it to match your own WAN/VLAN-only interfaces instead of the author's `igb0`-`igb3`.
+- **MaxMind license key** — your own free account/key from maxmind.com (used once, to download the GeoIP database; not stored anywhere in the dashboard itself).
+- **OPNsense syslog target** — point it at your own Graylog server's hostname/IP, not the author's.
+
 ## Changelog
 
 Fixed several issues that caused the Firewall panels to show "No data" out of the box:
