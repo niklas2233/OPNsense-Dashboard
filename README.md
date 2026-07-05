@@ -23,6 +23,7 @@ Everything below ships with placeholder or author-specific values. The detailed 
 - **Graylog root password** — `GRAYLOG_ROOT_PASSWORD_SHA2` defaults to `admin`/`admin`. Generate your own with `echo -n "yourpassword" | sha256sum`.
 - **Graylog password secret** — `GRAYLOG_PASSWORD_SECRET`, any random string of 16+ characters.
 - **Graylog external URI** — `GRAYLOG_HTTP_EXTERNAL_URI` should be the real IP/hostname Graylog is reachable at, not `127.0.0.1`, or the web UI will misbehave for anyone connecting from another machine.
+- **Timezone** — the `TZ` env var on every container (and `GRAYLOG_ROOT_TIMEZONE` on Graylog specifically) defaults to `Etc/UTC` in the example. Set these to your own timezone or timestamps in Graylog's UI and container logs won't line up with your local time.
 - **InfluxDB org, bucket, and API token** — created when you first set up InfluxDB (see InfluxDB below). The dashboard's Flux queries hardcode the bucket name `opnsense`, so either name your bucket `opnsense` or find-and-replace `bucket: "opnsense"` across the dashboard JSON before importing.
 - **Telegraf config** (`config/telegraf.conf`, placed on the router) — your InfluxDB URL, API token, org, and bucket under `[[outputs.influxdb_v2]]`.
 - **Grafana datasources on import** — Grafana prompts you to map the dashboard's `InfluxDB` and `Elasticsearch` datasource variables to your own data sources.
@@ -69,6 +70,10 @@ services:
   mongodb:
     container_name: mongodb
     image: mongo:4.2
+    environment:
+      # Set this to your own timezone (e.g. America/New_York) so log timestamps in
+      # container logs/backups line up with local time instead of defaulting to UTC.
+      - TZ=Etc/UTC
     volumes:
       - mongodb_data:/data/db
     restart: "unless-stopped"
@@ -78,10 +83,15 @@ services:
     volumes:
       - es_data:/usr/share/elasticsearch/data
     environment:
+      - TZ=Etc/UTC
       - http.host=0.0.0.0
       - transport.host=localhost
       - network.host=0.0.0.0
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      # Optional: exposes Elasticsearch on the host for direct troubleshooting
+      # (e.g. curl-ing indices/mappings). Not required for the dashboard itself.
+      - 9200:9200
     ulimits:
       memlock:
         soft: -1
@@ -91,16 +101,22 @@ services:
   graylog:
     container_name: graylog
     image: graylog/graylog:4.2
+    entrypoint: /usr/bin/tini -- wait-for-it elasticsearch:9200 --  /docker-entrypoint.sh
     volumes:
       - graylog_data:/usr/share/graylog/data
     environment:
+      - TZ=Etc/UTC
+      # Set this to your own timezone, or Graylog's UI will display all
+      # timestamps in UTC regardless of the TZ var above.
+      - GRAYLOG_ROOT_TIMEZONE=Etc/UTC
       # CHANGE ME (must be at least 16 characters)!
       - GRAYLOG_PASSWORD_SECRET=ZDcwMzQ3NTE4ZTIwM
       # Username is "admin"
       # Password is "admin", change this to your own hashed password. 'echo -n "password" | sha256sum' 
       - GRAYLOG_ROOT_PASSWORD_SHA2=8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
-      - GRAYLOG_HTTP_EXTERNAL_URI=http://127.0.0.1:9000/
-      entrypoint: /usr/bin/tini -- wait-for-it elasticsearch:9200 --  /docker-entrypoint.sh
+      # Change to the IP/hostname Graylog is actually reachable at - see
+      # "Settings You Must Change For Your Own Install" above.
+      - GRAYLOG_HTTP_EXTERNAL_URI=http://<your-host-ip>:9000/
     links:
       - mongodb:mongo
       - elasticsearch
@@ -122,6 +138,8 @@ services:
   influxdb:
     container_name: influxdb
     image: influxdb:latest
+    environment:
+      - TZ=Etc/UTC
     ports:
       - '8086:8086'
     volumes:
@@ -137,6 +155,7 @@ services:
     depends_on:
       - influxdb
     environment:
+      - TZ=Etc/UTC
       # Change these
       - GF_SECURITY_ADMIN_USER=opnsense
       - GF_SECURITY_ADMIN_PASSWORD=opnsense
