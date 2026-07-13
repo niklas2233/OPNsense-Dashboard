@@ -203,6 +203,15 @@ You must edit this file and put in your InfluxDB URL, InfluxDB API token, organi
 
 You will need to place this config in /usr/local/etc on the router.
 
+The `pkg install` sets up Telegraf to run as an unprivileged `telegraf` system user, which by default can't read `/dev/pf` (needed for the `pf` measurement) or `/conf/config.xml` (needed by `telegraf_pfifgw.php` for the `gateways`/`interface` measurements). Grant both before starting the service, run as root:
+
+```sh
+pw groupmod proxy -m telegraf
+setfacl -m u:telegraf:r-----a-R-c--s::allow /conf/config.xml
+```
+
+The first grants `/dev/pf` access via its existing group. The second grants read-only access to just `config.xml` via a scoped NFSv4 ACL (requires ZFS/UFS with ACLs enabled), rather than adding `telegraf` to `wheel`, which would hand a monitoring daemon read access to every secret on the box. Skipping this doesn't stop Telegraf from starting — it just silently fails those two measurements on every gather cycle, which then breaks the `$Host` dashboard variable (see Changelog).
+
 After this is done, use `sudo service telegraf start` to start telegraf.
 
 ### Graylog
